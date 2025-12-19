@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>Todo List（移动端优化）</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont,
+                   "PingFang SC", "Helvetica Neue",
+                   Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: #f5f7fa;
+    }
+
+    /* 整体容器 */
+    .todo-container {
+      max-width: 420px;
+      margin: 0 auto;
+      min-height: 100vh;
+      background: #fff;
+      padding: 16px;
+    }
+
+    /* 标题：放在最上方，适合手机 */
+    h1 {
+      text-align: center;
+      font-size: 22px;
+      font-weight: 600;
+      margin: 12px 0 20px;
+    }
+
+    /* 输入区域 */
+    .input-group {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .input-group input {
+      flex: 1;
+      padding: 10px 12px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+    }
+
+    .input-group button {
+      padding: 10px 14px;
+      font-size: 15px;
+      border: none;
+      border-radius: 6px;
+      background: #4f46e5;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    /* 列表 */
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 6px;
+      border-bottom: 1px solid #eee;
+    }
+
+    /* 待办事项文字 */
+    li span {
+      font-size: 16px;
+      line-height: 1.4;
+      flex: 1;
+      margin-right: 8px;
+      word-break: break-all;
+    }
+
+    /* 删除按钮 */
+    .delete-btn {
+      background: #ff4d4f;
+      border: none;
+      color: #fff;
+      padding: 6px 10px;
+      font-size: 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="todo-container">
+    <h1>Todo List</h1>
+
+    <div class="input-group">
+      <input type="text" id="todoInput" placeholder="请输入待办事项" />
+      <button id="addBtn">添加</button>
+    </div>
+
+    <ul id="todoList"></ul>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const input = document.getElementById('todoInput');
+      const list = document.getElementById('todoList');
+      const addBtn = document.getElementById('addBtn');
+
+      let todos = JSON.parse(localStorage.getItem('todos')) || [];
+
+      function saveTodos() {
+        localStorage.setItem('todos', JSON.stringify(todos));
+      }
+
+      function renderTodos() {
+        list.innerHTML = '';
+        todos.forEach((text, index) => {
+          const li = document.createElement('li');
+          const span = document.createElement('span');
+          span.textContent = text;
+
+          const delBtn = document.createElement('button');
+          delBtn.textContent = '删除';
+          delBtn.className = 'delete-btn';
+          delBtn.onclick = () => {
+            todos.splice(index, 1);
+            saveTodos();
+            renderTodos();
+          };
+
+          li.appendChild(span);
+          li.appendChild(delBtn);
+          list.appendChild(li);
+        });
+      }
+
+      function addTodo() {
+        const text = input.value.trim();
+        if (!text) return;
+        todos.push(text);
+        saveTodos();
+        renderTodos();
+        input.value = '';
+      }
+
+      addBtn.addEventListener('click', addTodo);
+      input.addEventListener('keyup', e => {
+        if (e.key === 'Enter') addTodo();
+      });
+
+      renderTodos();
+    });
+  </script>
+</body>
+</html>
